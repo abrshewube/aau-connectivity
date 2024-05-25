@@ -18,4 +18,7 @@ export class CreateUserDto {
 
   @ApiProperty({ example: false, description: 'Status of the user', default: false })
   readonly status?: boolean;
+
+  @ApiProperty({ example: 'user', description: 'Role of the user', default: 'user' })
+  readonly role: string; 
 }

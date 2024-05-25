@@ -5,7 +5,7 @@ export class CreateStudentDto {
   readonly studentId: string;
 
   @ApiProperty({ example: 'schoolpassword', description: 'The password for the student' })
-  readonly password: string;
+  readonly studentPassword: string;
 
   @ApiProperty({ example: false, description: 'Whether the student ID has been used', default: false })
   readonly used?: boolean;

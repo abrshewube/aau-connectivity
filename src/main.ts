@@ -6,9 +6,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Students API')
+    .setTitle('AAU-CONNECTIFY API')
     .setDescription('API documentation for the Students service')
     .setVersion('1.0')
+    .addBearerAuth() // Add this line to enable bearer token authentication
     .addTag('students')
     .build();
   const document = SwaggerModule.createDocument(app, config);

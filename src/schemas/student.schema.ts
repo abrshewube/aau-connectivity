@@ -7,7 +7,7 @@ export class Student extends Document {
   studentId: string;
 
   @Prop({ required: true })
-  password: string;
+  studentPassword: string;
 
   @Prop({ default: false })
   used: boolean;

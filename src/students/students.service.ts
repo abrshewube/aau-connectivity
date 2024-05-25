@@ -8,8 +8,8 @@ import { Student } from 'src/schemas/student.schema';
 export class StudentsService {
   constructor(@InjectModel(Student.name) private studentModel: Model<Student>) {}
 
-  async checkCredentials(studentId: string, password: string): Promise<boolean> {
-    const student = await this.studentModel.findOne({ studentId, password }).exec();
+  async checkCredentials(studentId: string, studentPassword: string): Promise<boolean> {
+    const student = await this.studentModel.findOne({ studentId,studentPassword }).exec();
     return !!student;
   }
 
