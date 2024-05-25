@@ -16,7 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '1h' },
     }),
-    MongooseModule.forRoot('mongodb://localhost:27017/aau'),
+    MongooseModule.forRoot('mongodb+srv://abenezerzgeyework:NKx7e1prjVAOuHsh@cluster0.dcmutbn.mongodb.net/aau?retryWrites=true&w=majority&appName=Cluster0'),
     StudentsModule,
     AuthModule,
     AnnouncementsModule
