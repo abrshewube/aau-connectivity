@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { CommentsModule } from './comments/comments.module';
 
 
+
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }), // Register the default JWT strategy
@@ -17,7 +18,7 @@ import { CommentsModule } from './comments/comments.module';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '1h' },
     }),
-    MongooseModule.forRoot('mongodb://localhost:27017/aau'),
+    MongooseModule.forRoot('mongodb+srv://abenezerzgeyework:NKx7e1prjVAOuHsh@cluster0.dcmutbn.mongodb.net/kokebe?retryWrites=true&w=majority&appName=Cluster0'),
     StudentsModule,
     AuthModule,
     AnnouncementsModule,

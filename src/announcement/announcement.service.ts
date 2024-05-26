@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { CreateAnnouncementDto } from 'src/dto/create-announcement.dto';
 import { UpdateAnnouncementDto } from 'src/dto/update-announcement.dto';
 import { Announcement } from 'src/schemas/announcement.schema';
+import * as cloudinary from 'cloudinary';
 
 
 @Injectable()
@@ -17,9 +18,15 @@ export class AnnouncementService {
 
   async create(createAnnouncementDto: CreateAnnouncementDto): Promise<Announcement> {
     const createdAnnouncement = new this.announcementModel(createAnnouncementDto);
+
+    // Upload image to Cloudinary
+    const image = await cloudinary.v2.uploader.upload(createAnnouncementDto.image);
+
+    // Set the image URL in the announcement object
+    createdAnnouncement.image = image.secure_url;
+
     return createdAnnouncement.save();
   }
-
   async findAll(page: number, limit: number): Promise<Announcement[]> {
     return this.announcementModel.find().skip((page - 1) * limit).limit(limit).exec();
   }
