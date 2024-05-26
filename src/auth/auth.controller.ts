@@ -1,11 +1,15 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { VerifyEmailDto } from 'src/dto/verify-email.dto';
 import { LoginDto } from 'src/dto/login.dto';
 import { VerifyEmailResponseDto } from 'src/dto/verify-email-response.dto'; // Import the new DTO
 import { User } from 'src/schemas/user.schema';
+import { AuthGuard } from 'src/guard/auth.guard';
+import { Roles } from 'src/guard/roles.decorator';
+import { UserRole } from 'src/schemas/user-role.enum';
+import { ChangeRoleDto } from 'src/dto/change-role.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -70,5 +74,57 @@ export class AuthController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+    
 }
+
+@Put('role')
+@UseGuards(AuthGuard)
+@Roles(UserRole.SUPER_ADMIN)
+@ApiOperation({ summary: 'Change user role' })
+@ApiBearerAuth()
+@ApiResponse({ status: 200, description: 'User role updated successfully.' })
+async changeUserRole(@Body() changeRoleDto: ChangeRoleDto) {
+  try {
+    const updatedUser = await this.authService.changeUserRole(changeRoleDto.userId, changeRoleDto.newRole);
+    return { message: 'User role updated successfully.', user: updatedUser };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+@Delete(':userId')
+@UseGuards(AuthGuard)
+@Roles(UserRole.SUPER_ADMIN)
+@ApiOperation({ summary: 'Delete a user' })
+@ApiBearerAuth()
+@ApiResponse({ status: 200, description: 'User deleted successfully.' })
+async deleteUser(@Param('userId') userId: string) {
+  try {
+    await this.authService.deleteUser(userId);
+    return { message: 'User deleted successfully.' };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+@Get()
+@UseGuards(AuthGuard)
+@Roles(UserRole.SUPER_ADMIN)
+@ApiOperation({ summary: 'Get all users' })
+@ApiBearerAuth()
+@ApiResponse({ status: 200, description: 'Successfully retrieved users.' })
+async getAllUsers() {
+  try {
+    const users = await this.authService.getAllUsers();
+    return { users };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+
+
+
 }

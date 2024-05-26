@@ -10,6 +10,7 @@ import { VerifyEmailDto } from 'src/dto/verify-email.dto';
 import { User } from 'src/schemas/user.schema';
 import { Student } from 'src/schemas/student.schema';
 import * as jwt from 'jsonwebtoken';
+import { UserRole } from 'src/schemas/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -106,6 +107,26 @@ export class AuthService {
 
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userModel.findOne({ email });
+  }
+
+  // New methods for superadmin functionalities
+  async changeUserRole(userId: string, newRole: UserRole): Promise<User> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    user.role = newRole;
+    return user.save();
+  }
+  async deleteUser(userId: string): Promise<void> {
+    const result = await this.userModel.deleteOne({ _id: userId });
+    if (result.deletedCount === 0) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return this.userModel.find().exec();
   }
   
 }
