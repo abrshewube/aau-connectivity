@@ -14,8 +14,8 @@ export class StudentsController {
   @ApiResponse({ status: 200, description: 'Student exists or not', type: Boolean })
   @ApiBody({ type: CheckCredentialsDto })
   async checkCredentials(@Body() checkCredentialsDto: CheckCredentialsDto): Promise<{ exists: boolean }> {
-    const { studentId, password } = checkCredentialsDto;
-    const exists = await this.studentsService.checkCredentials(studentId, password);
+    const { studentId, studentPassword } = checkCredentialsDto;
+    const exists = await this.studentsService.checkCredentials(studentId, studentPassword);
     return { exists };
   }
 

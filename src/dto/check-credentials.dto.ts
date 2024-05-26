@@ -5,5 +5,5 @@ export class CheckCredentialsDto {
   readonly studentId: string;
 
   @ApiProperty({ example: 'schoolpassword', description: 'The password for the student' })
-  readonly password: string;
+  readonly studentPassword: string;
 }
