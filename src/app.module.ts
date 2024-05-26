@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { AnnouncementsModule } from './announcement/announcement.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { CommentsModule } from './comments/comments.module';
 
 
 @Module({
@@ -16,10 +17,11 @@ import { JwtModule } from '@nestjs/jwt';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '1h' },
     }),
-    MongooseModule.forRoot('mongodb+srv://abenezerzgeyework:NKx7e1prjVAOuHsh@cluster0.dcmutbn.mongodb.net/aau?retryWrites=true&w=majority&appName=Cluster0'),
+    MongooseModule.forRoot('mongodb://localhost:27017/aau'),
     StudentsModule,
     AuthModule,
-    AnnouncementsModule
+    AnnouncementsModule,
+    CommentsModule
 
   ],
   controllers: [AppController],
