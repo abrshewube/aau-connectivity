@@ -19,7 +19,7 @@ import { CommentsModule } from './comments/comments.module';
       secret: 'your-secret-key',
       signOptions: { expiresIn: '1h' },
     }),
-    MongooseModule.forRoot('mongodb+srv://fuaadmuhe12:fuaadmuhe12@cluster0.cvtjesx.mongodb.net/aauconnect?retryWrites=true&w=majority&appName=Cluster0'),
+    MongooseModule.forRoot('mongodb+srv://fuaadmuhe12:<fuaadmuhe@12>@cluster0.cvtjesx.mongodb.net/aauconnecting?retryWrites=true&w=majority&appName=Cluster0'),
     StudentsModule,
     AuthModule,
     AnnouncementsModule,
