@@ -22,8 +22,8 @@ export class Announcement extends Document {
   @Prop({ required: true })
   image: string;
 
-  @Prop({ type: [String], required: true })
-  tags: string[];
+  @Prop({ required: true })
+  tag: string; 
 }
 
 export const AnnouncementSchema = SchemaFactory.createForClass(Announcement);

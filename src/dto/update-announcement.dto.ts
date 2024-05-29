@@ -21,5 +21,5 @@ export class UpdateAnnouncementDto {
     readonly image?: string;
 
     @ApiProperty({ description: 'Tags associated with the announcement' })
-    readonly tags?: string[];
+    readonly tag?: string;
 }
