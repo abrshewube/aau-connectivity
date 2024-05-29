@@ -7,11 +7,14 @@ import { AuthController } from './auth.controller';
 import { User, UserSchema } from '../schemas/user.schema';
 import { StudentsModule } from 'src/students/students.module';
 import { Student, StudentSchema } from 'src/schemas/student.schema';
+import { Profile, ProfileSchema } from 'src/schemas/profile.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Student.name, schema: StudentSchema }]),
+    MongooseModule.forFeature([{ name: Profile.name, schema: ProfileSchema}]),
+    
     JwtModule.register({
       secret: 'your-secret-key',
       signOptions: { expiresIn: '1h' },

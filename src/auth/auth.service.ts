@@ -11,12 +11,16 @@ import { User } from 'src/schemas/user.schema';
 import { Student } from 'src/schemas/student.schema';
 import * as jwt from 'jsonwebtoken';
 import { UserRole } from 'src/schemas/user-role.enum';
+import { CreateProfileDto } from 'src/dto/create-profile.dto';
+import { UpdateProfileDto } from 'src/dto/update-profile.dto';
+import { Profile } from 'src/schemas/profile.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Student.name) private studentModel: Model<Student>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Profile.name) private profileModel: Model<Profile>,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
   ) {}
@@ -127,6 +131,29 @@ export class AuthService {
 
   async getAllUsers(): Promise<User[]> {
     return this.userModel.find().exec();
+  }
+  async createProfile(userId: string, createProfileDto: CreateProfileDto): Promise<Profile> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const newProfile = new this.profileModel({
+      ...createProfileDto,
+      user: user._id,
+    });
+
+    return newProfile.save();
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<Profile> {
+    const profile = await this.profileModel.findOne({ user: userId });
+    if (!profile) {
+      throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+    }
+
+    Object.assign(profile, updateProfileDto);
+    return profile.save();
   }
   
 }

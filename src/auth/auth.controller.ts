@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Put, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Put, Delete, Get, Param, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/dto/create-user.dto';
@@ -10,6 +10,8 @@ import { AuthGuard } from 'src/guard/auth.guard';
 import { Roles } from 'src/guard/roles.decorator';
 import { UserRole } from 'src/schemas/user-role.enum';
 import { ChangeRoleDto } from 'src/dto/change-role.dto';
+import { CreateProfileDto } from 'src/dto/create-profile.dto';
+import { UpdateProfileDto } from 'src/dto/update-profile.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -124,6 +126,38 @@ async getAllUsers() {
   }
 }
 
+
+@Post('profile')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiOperation({ summary: 'Create user profile' })
+@ApiResponse({ status: 201, description: 'Profile created successfully.' })
+@ApiBody({ type: CreateProfileDto })
+async createProfile(@Body() createProfileDto: CreateProfileDto, @Req() req) {
+  try {
+    const userId = req.user.userId;
+    const profile = await this.authService.createProfile(userId, createProfileDto);
+    return { message: 'Profile created successfully.', profile };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+@Put('profile')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiOperation({ summary: 'Update user profile' })
+@ApiResponse({ status: 200, description: 'Profile updated successfully.' })
+@ApiBody({ type: UpdateProfileDto })
+async updateProfile(@Body() updateProfileDto: UpdateProfileDto, @Req() req) {
+  try {
+    const userId = req.user.userId;
+    const profile = await this.authService.updateProfile(userId, updateProfileDto);
+    return { message: 'Profile updated successfully.', profile };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
 
 
 
