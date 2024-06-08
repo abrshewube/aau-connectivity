@@ -69,13 +69,17 @@ export class AuthService {
     return false;
   }
   async generateJwtToken(user: User): Promise<string> {
+    
+    
     const payload = {
       email: user.email,
       role: user.role, // Include the user's role
+     
     };
     const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });
     return token;
   }
+  
 generateVerificationCode(): string {
     return Math.random().toString(36).substr(2, 6).toUpperCase();
   }
@@ -101,13 +105,15 @@ generateVerificationCode(): string {
       const decodedToken = this.jwtService.verify(token);
       
       const { email, role } = decodedToken;
+      console.log(decodedToken)
   
      
-      return { email, role };
+      return { email, role};
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
   }
+  
 
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userModel.findOne({ email });
@@ -132,32 +138,65 @@ generateVerificationCode(): string {
   async getAllUsers(): Promise<User[]> {
     return this.userModel.find().exec();
   }
-  async createProfile(userId: string, createProfileDto: CreateProfileDto): Promise<Profile> {
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  async createProfile(token: string, createProfileDto: CreateProfileDto): Promise<Profile> {
+    try {
+      // Validate the token to extract the user's email
+      const decodedToken = await this.validateToken(token);
+      const userEmail = decodedToken.email;
+  
+      // Find the user based on the email
+      const user = await this.userModel.findOne({ email: userEmail });
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+  
+      // Create a new profile
+      const newProfile = new this.profileModel({
+        ...createProfileDto,
+        user: user._id, // Set user field to user's _id
+      });
+  
+      return newProfile.save();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-
-    const newProfile = new this.profileModel({
-      ...createProfileDto,
-      user: user._id,
-    });
-
-    return newProfile.save();
   }
-
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<Profile> {
-    const profile = await this.profileModel.findOne({ user: userId });
-    if (!profile) {
-      throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+  
+  async updateProfile(token: string, updateProfileDto: UpdateProfileDto): Promise<Profile> {
+    try {
+      // Validate the token to extract the user's email
+      const decodedToken = await this.validateToken(token);
+      const userEmail = decodedToken.email;
+  
+      // Find the profile based on the user's email
+      const profile = await this.profileModel.findOne({ user: userEmail });
+      if (!profile) {
+        throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+      }
+  
+      // Update the profile
+      Object.assign(profile, updateProfileDto);
+      return profile.save();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-
-    Object.assign(profile, updateProfileDto);
-    return profile.save();
   }
-
-  async getProfile(userId: string): Promise<Profile | undefined> {
-    return this.profileModel.findOne({ user: userId });
+  
+  async getProfile(token: string): Promise<Profile | undefined> {
+    try {
+      // Validate the token to extract the user's email
+      const decodedToken = await this.validateToken(token);
+      const userEmail = decodedToken.email;
+  
+      // Fetch the profile associated with the user's email
+      const profile = await this.profileModel.findOne({ user: userEmail });
+  
+      return profile;
+    } catch (error) {
+      // Handle errors, such as token validation failure
+      console.log('Error fetching profile:', error.message);
+      return undefined;
+    }
   }
   
 

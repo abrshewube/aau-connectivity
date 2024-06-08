@@ -12,6 +12,7 @@ import { UserRole } from 'src/schemas/user-role.enum';
 import { ChangeRoleDto } from 'src/dto/change-role.dto';
 import { CreateProfileDto } from 'src/dto/create-profile.dto';
 import { UpdateProfileDto } from 'src/dto/update-profile.dto';
+import { CustomAuthGuard } from 'src/guard/auth2.guard';
 import { ResetPasswordDto } from 'src/dto/reset-password.dto';
 
 @ApiTags('auth')
@@ -127,7 +128,6 @@ async getAllUsers() {
   }
 }
 
-
 @Post('profile')
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -136,8 +136,8 @@ async getAllUsers() {
 @ApiBody({ type: CreateProfileDto })
 async createProfile(@Body() createProfileDto: CreateProfileDto, @Req() req) {
   try {
-    const userId = req.user.userId;
-    const profile = await this.authService.createProfile(userId, createProfileDto);
+    const token = req.headers.authorization.split(' ')[1]; // Extract the token from the authorization header
+    const profile = await this.authService.createProfile(token, createProfileDto);
     return { message: 'Profile created successfully.', profile };
   } catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -152,29 +152,33 @@ async createProfile(@Body() createProfileDto: CreateProfileDto, @Req() req) {
 @ApiBody({ type: UpdateProfileDto })
 async updateProfile(@Body() updateProfileDto: UpdateProfileDto, @Req() req) {
   try {
-    const userId = req.user.userId;
-    const profile = await this.authService.updateProfile(userId, updateProfileDto);
+    const token = req.headers.authorization.split(' ')[1]; // Extract the token from the authorization header
+    const profile = await this.authService.updateProfile(token, updateProfileDto);
     return { message: 'Profile updated successfully.', profile };
   } catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
 }
 
+
 @Get('profile')
 @UseGuards(AuthGuard)
+// @Roles(UserRole.USER)
 @ApiBearerAuth()
 @ApiOperation({ summary: 'Get profile of logged in user' })
 @ApiResponse({ status: 200, description: 'Successfully retrieved user profile.' })
 async getProfile(@Req() req) {
   try {
-    const userId = req.user.userId;
-    const profile = await this.authService.getProfile(userId);
+    const token = req.headers.authorization.split(' ')[1]; // Extract the token from the authorization header
+    const profile = await this.authService.getProfile(token);
+    if (!profile) {
+      throw new HttpException('Profile not found.', HttpStatus.NOT_FOUND);
+    }
     return { profile };
   } catch (error) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
 }
-
 @Post('reset-password')
 @ApiOperation({ summary: 'Reset password through email verification' })
 @ApiResponse({ status: 200, description: 'Password reset email sent successfully.' })
@@ -195,6 +199,5 @@ async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
 }
-
 
 }

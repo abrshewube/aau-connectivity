@@ -10,36 +10,46 @@ export class AuthGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest();
       const { authorization }: any = request.headers;
-
+  
       if (!authorization || authorization.trim() === '') {
         throw new UnauthorizedException('Please provide a token');
       }
-
+  
       const authToken = authorization.replace(/bearer/gim, '').trim();
       const decodedData = await this.authService.validateToken(authToken);
-
+  
       // Extract user role from decoded data
       const userRole: UserRole = decodedData.role;
-
+  
       // Log user details including the token and role
       console.log('User Details:', {
         token: authToken,
         user: decodedData,
         role: userRole,
       });
-
+  
       // Attach decoded data to the request for later use
       request.decodedData = decodedData;
-
-      // Check user's role
+  
+      // Check if the route is "auth/profile" or "auth/reset-password"
+      const route = request.url.split('/')[2]; // Adjust index according to your route structure
+      if (route === 'profile' || route === 'reset-password') {
+        // Allow access for specific roles
+        if (userRole === UserRole.USER || userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN) {
+          return true;
+        }
+      }
+  
+      // Check user's role for admin and super admin
       if (userRole !== UserRole.ADMIN && userRole !== UserRole.SUPER_ADMIN) {
         throw new ForbiddenException('Insufficient permissions');
       }
-
+  
       return true;
     } catch (error) {
       console.log('Auth error:', error.message);
       throw new ForbiddenException(error.message || 'Session expired! Please sign in');
     }
   }
+  
 }
