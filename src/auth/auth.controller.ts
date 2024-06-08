@@ -12,6 +12,7 @@ import { UserRole } from 'src/schemas/user-role.enum';
 import { ChangeRoleDto } from 'src/dto/change-role.dto';
 import { CreateProfileDto } from 'src/dto/create-profile.dto';
 import { UpdateProfileDto } from 'src/dto/update-profile.dto';
+import { ResetPasswordDto } from 'src/dto/reset-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -159,6 +160,41 @@ async updateProfile(@Body() updateProfileDto: UpdateProfileDto, @Req() req) {
   }
 }
 
+@Get('profile')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiOperation({ summary: 'Get profile of logged in user' })
+@ApiResponse({ status: 200, description: 'Successfully retrieved user profile.' })
+async getProfile(@Req() req) {
+  try {
+    const userId = req.user.userId;
+    const profile = await this.authService.getProfile(userId);
+    return { profile };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+@Post('reset-password')
+@ApiOperation({ summary: 'Reset password through email verification' })
+@ApiResponse({ status: 200, description: 'Password reset email sent successfully.' })
+@ApiBody({ type: ResetPasswordDto })
+async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+  try {
+    const { email } = resetPasswordDto;
+    // Check if user exists with the provided email
+    const user = await this.authService.findByEmail(email);
+    if (!user) {
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+    }
+    // Generate a verification code and send it to the user's email
+    const verificationCode = await this.authService.generateVerificationCode();
+    await this.authService.sendPasswordResetEmail(email, verificationCode);
+    return { message: 'Password reset email sent successfully.' };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
 
 
 }

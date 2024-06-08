@@ -76,7 +76,7 @@ export class AuthService {
     const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });
     return token;
   }
-  private generateVerificationCode(): string {
+generateVerificationCode(): string {
     return Math.random().toString(36).substr(2, 6).toUpperCase();
   }
 
@@ -155,5 +155,22 @@ export class AuthService {
     Object.assign(profile, updateProfileDto);
     return profile.save();
   }
+
+  async getProfile(userId: string): Promise<Profile | undefined> {
+    return this.profileModel.findOne({ user: userId });
+  }
+  
+
+  async resetPassword(email: string): Promise<void> {
+    // Generate a verification code
+    const verificationCode = this.generateVerificationCode();
+  
+    // Update user's verification code in the database
+    await this.userModel.updateOne({ email }, { verificationCode });
+  
+    // Send password reset email with verification code
+    await this.sendPasswordResetEmail(email, verificationCode);
+  }
+  
   
 }
