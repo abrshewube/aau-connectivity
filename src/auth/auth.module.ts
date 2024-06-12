@@ -17,7 +17,7 @@ import { Profile, ProfileSchema } from 'src/schemas/profile.schema';
     
     JwtModule.register({
       secret: 'your-secret-key',
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '2d' },
     }),
     MailerModule.forRoot({
       transport: {
