@@ -158,10 +158,9 @@ generateVerificationCode(): string {
   
       return newProfile.save();
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message || 'Failed to create profile.', HttpStatus.BAD_REQUEST);
     }
   }
-  
   async updateProfile(token: string, updateProfileDto: UpdateProfileDto): Promise<Profile> {
     try {
       // Validate the token to extract the user's email
@@ -174,13 +173,33 @@ generateVerificationCode(): string {
         throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
       }
   
-      // Update the profile
+      // Update the profile fields
       Object.assign(profile, updateProfileDto);
+  
+      // Save the updated profile
       return profile.save();
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message || 'Failed to update profile.', HttpStatus.BAD_REQUEST);
     }
   }
+  
+  
+  // async getProfile(token: string): Promise<Profile | undefined> {
+  //   try {
+  //     // Validate the token to extract the user's email
+  //     const decodedToken = await this.validateToken(token);
+  //     const userEmail = decodedToken.email;
+  
+  //     // Fetch the profile associated with the user's email
+  //     const profile = await this.profileModel.findOne({ user: userEmail });
+  
+  //     return profile;
+  //   } catch (error) {
+  //     // Handle errors, such as token validation failure
+  //     console.log('Error fetching profile:', error.message);
+  //     return undefined;
+  //   }
+  // }
   
   async getProfile(token: string): Promise<Profile | undefined> {
     try {
@@ -188,18 +207,25 @@ generateVerificationCode(): string {
       const decodedToken = await this.validateToken(token);
       const userEmail = decodedToken.email;
   
-      // Fetch the profile associated with the user's email
-      const profile = await this.profileModel.findOne({ user: userEmail });
+      // Find the profile based on the user's email
+      const user = await this.userModel.findOne({ email: userEmail });
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+  
+      // Fetch the profile associated with the user's ObjectId
+      const profile = await this.profileModel.findOne({ user: user._id });
+  
+      if (!profile) {
+        throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+      }
   
       return profile;
     } catch (error) {
-      // Handle errors, such as token validation failure
-      console.log('Error fetching profile:', error.message);
-      return undefined;
+      throw new HttpException(error.message || 'Failed to fetch profile.', HttpStatus.BAD_REQUEST);
     }
   }
   
-
   async resetPassword(email: string): Promise<void> {
     // Generate a verification code
     const verificationCode = this.generateVerificationCode();
