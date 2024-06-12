@@ -1,19 +1,28 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
-export class CustomAuthGuard extends AuthGuard('jwt') {
-  canActivate(context: ExecutionContext) {
-    // Check if the route is related to profile management
-    const request = context.switchToHttp().getRequest();
-    const isProfileRoute = request.url.includes('profile') || request.url.includes('reset-password');
+export class AuthenticatedGuard implements CanActivate {
+  constructor(private readonly authService: AuthService) {}
 
-    // If it's a profile route, just check if the user is authenticated
-    if (isProfileRoute) {
-      return super.canActivate(context);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    try {
+      const request = context.switchToHttp().getRequest();
+      const { authorization }: any = request.headers;
+
+      if (!authorization || authorization.trim() === '') {
+        throw new UnauthorizedException('Please provide a token');
+      }
+
+      const authToken = authorization.replace(/bearer/gim, '').trim();
+      await this.authService.validateToken(authToken);
+
+     
+
+      return true;
+    } catch (error) {
+      console.log('Authentication error:', error.message);
+      throw new UnauthorizedException(error.message || 'Session expired! Please sign in');
     }
-
-    // For other routes, perform role checking as usual
-    return super.canActivate(context);
   }
 }

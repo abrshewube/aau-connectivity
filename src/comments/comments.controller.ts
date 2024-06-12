@@ -6,6 +6,7 @@ import { UpdateCommentDto } from 'src/dto/update-comment.dto';
 import { Comment } from 'src/schemas/comment.schema';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guard/auth.guard';
+import { AuthenticatedGuard } from 'src/guard/auth2.guard';
 
 @ApiTags('comments')
 @Controller('comments')
@@ -13,7 +14,7 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthenticatedGuard)
   @ApiOperation({ summary: 'Create a new comment' })
   @ApiBearerAuth()
   @ApiBody({ type: CreateCommentDto })
@@ -35,7 +36,7 @@ export class CommentsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthenticatedGuard)
   @ApiOperation({ summary: 'Update a comment by ID' })
   @ApiBearerAuth()
   @ApiParam({ name: 'id', type: String })
@@ -48,7 +49,7 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthenticatedGuard)
   @ApiOperation({ summary: 'Delete a comment by ID' })
   @ApiBearerAuth()
   @ApiParam({ name: 'id', type: String })

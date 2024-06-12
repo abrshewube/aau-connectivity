@@ -12,7 +12,7 @@ import { UserRole } from 'src/schemas/user-role.enum';
 import { ChangeRoleDto } from 'src/dto/change-role.dto';
 import { CreateProfileDto } from 'src/dto/create-profile.dto';
 import { UpdateProfileDto } from 'src/dto/update-profile.dto';
-import { CustomAuthGuard } from 'src/guard/auth2.guard';
+import { AuthenticatedGuard } from 'src/guard/auth2.guard';
 import { ResetPasswordDto } from 'src/dto/reset-password.dto';
 
 @ApiTags('auth')
@@ -129,7 +129,7 @@ async getAllUsers() {
 }
 
 @Post('profile')
-@UseGuards(AuthGuard)
+@UseGuards(AuthenticatedGuard)
 @ApiBearerAuth()
 @ApiOperation({ summary: 'Create user profile' })
 @ApiResponse({ status: 201, description: 'Profile created successfully.' })
@@ -145,7 +145,7 @@ async createProfile(@Body() createProfileDto: CreateProfileDto, @Req() req) {
 }
 
 @Put('profile')
-@UseGuards(AuthGuard)
+@UseGuards(AuthenticatedGuard)
 @ApiBearerAuth()
 @ApiOperation({ summary: 'Update user profile' })
 @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
@@ -162,7 +162,7 @@ async updateProfile(@Body() updateProfileDto: UpdateProfileDto, @Req() req) {
 
 
 @Get('profile')
-@UseGuards(AuthGuard)
+@UseGuards(AuthenticatedGuard)
 // @Roles(UserRole.USER)
 @ApiBearerAuth()
 @ApiOperation({ summary: 'Get profile of logged in user' })
