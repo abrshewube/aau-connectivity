@@ -5,11 +5,21 @@ import * as cloudinary from 'cloudinary';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-   // Cloudinary configuration
-   cloudinary.v2.config({
-    cloud_name: 'dcixfqemc', 
-  api_key: '443894683639552', 
-  api_secret: 'bhj1-SWNgJSdjnFZE7Yv0jFqTMs'
+
+  // Enable CORS
+  app.enableCors({
+    origin: true, // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true,
+  });
+
+  // Cloudinary configuration
+  cloudinary.v2.config({
+    cloud_name: 'dcixfqemc',
+    api_key: '443894683639552',
+    api_secret: 'bhj1-SWNgJSdjnFZE7Yv0jFqTMs',
   });
 
   const config = new DocumentBuilder()

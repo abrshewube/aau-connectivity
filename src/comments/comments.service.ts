@@ -15,7 +15,7 @@ export class CommentsService {
   }
 
   async findAllByAnnouncementId(announcementId: string): Promise<Comment[]> {
-    return this.commentModel.find({ announcementId }).exec();
+    return this.commentModel.find({ announcementId }).populate('userId', 'fullName profilePicture').exec();
   }
 
   async findOne(id: string): Promise<Comment> {
@@ -26,25 +26,23 @@ export class CommentsService {
     return comment;
   }
 
-// Adjust the update method to accept UpdateCommentDto
-async update(id: string, updateCommentDto: UpdateCommentDto): Promise<Comment> {
-  const updatedComment = await this.commentModel
-    .findByIdAndUpdate(id, updateCommentDto, { new: true })
-    .exec();
+  async update(id: string, updateCommentDto: UpdateCommentDto): Promise<Comment> {
+    const updatedComment = await this.commentModel
+      .findByIdAndUpdate(id, updateCommentDto, { new: true })
+      .exec();
 
-  if (!updatedComment) {
-    throw new NotFoundException('Comment not found');
-  }
-
-  return updatedComment;
-}
-async remove(id: string): Promise<Comment> {
-  const comment = await this.commentModel.findById(id).exec();
-  if (!comment) {
+    if (!updatedComment) {
       throw new NotFoundException('Comment not found');
-  }
-  return this.commentModel.findByIdAndDelete(id).exec();
-}
+    }
 
-  
+    return updatedComment;
+  }
+
+  async remove(id: string): Promise<Comment> {
+    const comment = await this.commentModel.findById(id).exec();
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+    return this.commentModel.findByIdAndDelete(id).exec();
+  }
 }

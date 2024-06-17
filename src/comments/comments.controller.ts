@@ -1,11 +1,9 @@
-// comments.controller.ts
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from 'src/dto/create-comment.dto';
 import { UpdateCommentDto } from 'src/dto/update-comment.dto';
 import { Comment } from 'src/schemas/comment.schema';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
-import { AuthGuard } from 'src/guard/auth.guard';
 import { AuthenticatedGuard } from 'src/guard/auth2.guard';
 
 @ApiTags('comments')
@@ -24,7 +22,7 @@ export class CommentsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all comments by announcement ID' })
-  findAll(@Query('announcementId') announcementId: string): Promise<Comment[]> {
+  async findAll(@Query('announcementId') announcementId: string): Promise<Comment[]> {
     return this.commentsService.findAllByAnnouncementId(announcementId);
   }
 
