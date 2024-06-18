@@ -200,4 +200,20 @@ async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
   }
 }
 
+
+@Get('userid')
+@UseGuards(AuthenticatedGuard)
+@ApiBearerAuth()
+@ApiOperation({ summary: 'Get user ID of authenticated user' })
+@ApiResponse({ status: 200, description: 'Successfully retrieved user ID.' })
+async getUserId(@Req() req): Promise<{ userId: string }> {
+  try {
+    const token = req.headers.authorization.split(' ')[1]; // Extract the token from the authorization header
+    const userId = await this.authService.getUserId(token);
+    return { userId };
+  } catch (error) {
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  }
+}
+
 }

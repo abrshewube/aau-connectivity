@@ -239,5 +239,29 @@ generateVerificationCode(): string {
     await this.sendPasswordResetEmail(email, verificationCode);
   }
   
+
+  async getUserId(token: string): Promise<string> {
+    try {
+      // Verify the token and explicitly typecast it
+      const decodedToken = this.jwtService.verify(token) as { email: string } | undefined;
+
+      if (!decodedToken || typeof decodedToken.email !== 'string') {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      const userEmail = decodedToken.email;
+
+      // Find the user based on the email
+      const user = await this.userModel.findOne({ email: userEmail });
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return user._id.toString(); // Assuming user._id is of type ObjectId, convert to string
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
   
 }
