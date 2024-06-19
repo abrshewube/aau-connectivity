@@ -25,6 +25,9 @@ export class AuthService {
     private readonly mailerService: MailerService,
   ) {}
 
+  async onModuleInit() {
+    await this.createSuperAdmin();
+  }
   async register(createUserDto: CreateUserDto): Promise<User> {
     const { studentId, studentPassword, email } = createUserDto;
     
@@ -263,5 +266,30 @@ generateVerificationCode(): string {
     }
   }
 
+
+  async createSuperAdmin() {
+    const superAdminEmail = 'abrhamwubeeeeee1@gmail.com';
+    const superAdminPassword = 'passss';
+    const superAdminName = 'Fuad';
+
+    // Check if the superadmin user already exists
+    const existingUser = await this.userModel.findOne({ email: superAdminEmail });
+    if (!existingUser) {
+      const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
+      const superAdmin = new this.userModel({
+        fullName: superAdminName,
+        email: superAdminEmail,
+        password: hashedPassword,
+        studentId: 'defaultId', // You might need to adjust this field
+        studentPassword: 'defaultPassword', // You might need to adjust this field
+        role: UserRole.SUPER_ADMIN,
+        status: true,
+      });
+      await superAdmin.save();
+      console.log('SuperAdmin user created successfully');
+    } else {
+      console.log('SuperAdmin user already exists');
+    }
+  }
   
 }
