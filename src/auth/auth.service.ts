@@ -268,8 +268,8 @@ generateVerificationCode(): string {
 
 
   async createSuperAdmin() {
-    const superAdminEmail = 'abrhamwubeeeeee1@gmail.com';
-    const superAdminPassword = 'passss';
+    const superAdminEmail = 'fuad.mohammed@a2sv.org';
+    const superAdminPassword = 'pass';
     const superAdminName = 'Fuad';
 
     // Check if the superadmin user already exists
